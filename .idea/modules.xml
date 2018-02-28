@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DropboxAPITest.iml" filepath="$PROJECT_DIR$/DropboxAPITest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DropboxAPITest_main.iml" filepath="$PROJECT_DIR$/.idea/modules/DropboxAPITest_main.iml" group="DropboxAPITest" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DropboxAPITest_test.iml" filepath="$PROJECT_DIR$/.idea/modules/DropboxAPITest_test.iml" group="DropboxAPITest" />
     </modules>
   </component>
 </project>
