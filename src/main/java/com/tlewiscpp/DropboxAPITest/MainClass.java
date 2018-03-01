@@ -1,10 +1,8 @@
 package com.tlewiscpp.DropboxAPITest;
 
-import com.dropbox.core.DbxDownloader;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.users.FullAccount;
@@ -14,23 +12,41 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.util.Calendar;
+import java.util.Scanner;
 
-public class Main {
+public class MainClass {
     private static String accessToken;
 
     private static String getAccessToken(String filePath) {
+        try {
+            BufferedReader buffer = new BufferedReader(new FileInputStream(filePath));
+            String line=buffer.readLine();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         return "";
     }
 
+    private static String getApplicationName() {
+        try {
+            return new File(MainClass.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getName();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static void main(String args[]) throws DbxException {
-        if (args.length < 2) {
-            System.out.println(MessageFormat.format("Usage: {0} [PathToDropBoxAPIToken]", args[0]));
+        if (args.length < 1) {
+            System.out.println(MessageFormat.format("Usage: {0} [PathToDropBoxAPIToken]", getApplicationName()));
             System.exit(1);
         }
 
@@ -121,18 +137,18 @@ public class Main {
     private static void printDateReport(String dateString) {
         try {
             DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-            java.util.Calender calender = Calendar.getInstance();
-            calender.setTime(dateFormat.parse(dateString));
-            String workbookFileName = Integer.toString(calender.get(Calender.YEAR)) + "-Activity-Log.xlsx";
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateFormat.parse(dateString));
+            String workbookFileName = Integer.toString(calendar.get(Calendar.YEAR)) + "-Activity-Log.xlsx";
 
             Workbook workBook = WorkbookFactory.create(new File(workbookFileName));
-            Sheet targetSheet = workBook.getSheet(getMonthForInt(calender.get(Calender.MONTH)));
-            Row targetRow = targetSheet.getRow(ActivityLogConstants.ROW_OFFSET + date.getDay());
+            Sheet targetSheet = workBook.getSheet(getMonthForInt(calendar.get(Calendar.MONTH)));
+            Row targetRow = targetSheet.getRow(ActivityLogConstants.ROW_OFFSET + calendar.get(Calendar.DAY_OF_MONTH));
             double runDistance = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.RUN_DISTANCE).getStringCellValue());
             double cycleDistance = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.CYCLE_DISTANCE).getStringCellValue());
             double swimDistance = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.SWIM_DISTANCE).getStringCellValue());
             double foodTotals = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.FOOD_TOTALS).getStringCellValue());
-            System.out.print(MessageFormat.format("Totals for {0}", calender.toString()));
+            System.out.print(MessageFormat.format("Totals for {0}", calendar.toString()));
             System.out.print(MessageFormat.format("RunDistance = {0}", runDistance));
             System.out.print(MessageFormat.format("CycleDistance = {0}", cycleDistance));
             System.out.print(MessageFormat.format("SwimDistance = {0}", swimDistance));
