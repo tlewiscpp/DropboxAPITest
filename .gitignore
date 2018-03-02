@@ -1,3 +1,6 @@
+# Force gradle import
+.idea/
+
 *-Activity-Log.xlsx
 
 # Compiled class file
