@@ -17,7 +17,6 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.Calendar;
 import java.util.Scanner;
 
@@ -26,13 +25,13 @@ public class MainClass {
 
     private static String getAccessToken(String filePath) {
         try {
-            BufferedReader buffer = new BufferedReader(new FileInputStream(filePath));
-            String line=buffer.readLine();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            BufferedReader buffer = new BufferedReader(new FileReader(filePath));
+            String accessToken = buffer.readLine();
+            return accessToken;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return "";
         }
-        return "";
     }
 
     private static String getApplicationName() {
@@ -50,7 +49,7 @@ public class MainClass {
             System.exit(1);
         }
 
-        accessToken = getAccessToken(args[1]);
+        accessToken = getAccessToken(args[0]);
         
         // Create Dropbox client
         DbxRequestConfig config = new DbxRequestConfig("dropbox/DropboxAPITest", "en_US");
@@ -65,7 +64,7 @@ public class MainClass {
         String targetDocumentPath = "";
         while (true) {
             for (Metadata metadata : result.getEntries()) {
-                if (metadata.getName().startsWith(Integer.toString(Year.now().getValue()))) {
+                if (metadata.getName().startsWith(Integer.toString(Calendar.getInstance().get(Calendar.YEAR)))) {
                     targetDocumentName = metadata.getName();
                     targetDocumentPath = metadata.getPathLower();
                 }
@@ -144,15 +143,20 @@ public class MainClass {
             Workbook workBook = WorkbookFactory.create(new File(workbookFileName));
             Sheet targetSheet = workBook.getSheet(getMonthForInt(calendar.get(Calendar.MONTH)));
             Row targetRow = targetSheet.getRow(ActivityLogConstants.ROW_OFFSET + calendar.get(Calendar.DAY_OF_MONTH));
-            double runDistance = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.RUN_DISTANCE).getStringCellValue());
-            double cycleDistance = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.CYCLE_DISTANCE).getStringCellValue());
-            double swimDistance = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.SWIM_DISTANCE).getStringCellValue());
-            double foodTotals = Double.parseDouble(targetRow.getCell(ActivityLogConstants.ColumnIndex.FOOD_TOTALS).getStringCellValue());
-            System.out.print(MessageFormat.format("Totals for {0}", calendar.toString()));
-            System.out.print(MessageFormat.format("RunDistance = {0}", runDistance));
-            System.out.print(MessageFormat.format("CycleDistance = {0}", cycleDistance));
-            System.out.print(MessageFormat.format("SwimDistance = {0}", swimDistance));
-            System.out.print(MessageFormat.format("FoodDistance = {0}", foodTotals));
+            String runDistanceString = targetRow.getCell(ActivityLogConstants.ColumnIndex.RUN_DISTANCE).toString();
+            String cycleDistanceString = targetRow.getCell(ActivityLogConstants.ColumnIndex.CYCLE_DISTANCE).toString();
+            String swimDistanceString = targetRow.getCell(ActivityLogConstants.ColumnIndex.SWIM_DISTANCE).toString();
+            String foodTotalsString = targetRow.getCell(ActivityLogConstants.ColumnIndex.FOOD_TOTALS).toString();
+            double runDistance = Double.parseDouble(runDistanceString);
+            double cycleDistance = Double.parseDouble(cycleDistanceString);
+            double swimDistance = Double.parseDouble(swimDistanceString);
+            //double foodTotals = Double.parseDouble(foodTotalsString);
+            double foodTotals = targetRow.getCell(ActivityLogConstants.ColumnIndex.FOOD_TOTALS).getNumericCellValue();
+            System.out.println(MessageFormat.format("Totals for {0}", calendar.toString()));
+            System.out.println(MessageFormat.format("RunDistance = {0}", runDistance));
+            System.out.println(MessageFormat.format("CycleDistance = {0}", cycleDistance));
+            System.out.println(MessageFormat.format("SwimDistance = {0}", swimDistance));
+            System.out.println(MessageFormat.format("FoodTotals = {0}", foodTotals));
             workBook.close();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
